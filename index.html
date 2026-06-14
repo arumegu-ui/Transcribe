@@ -44,7 +44,6 @@
       height: 100dvh;
       height: 100vh;
       padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
       padding-left: env(safe-area-inset-left);
       padding-right: env(safe-area-inset-right);
     }
@@ -179,7 +178,7 @@
 
     /* ── コントロールパネル ──────────────────────── */
     .controls {
-      padding: 14px 18px 20px;
+      padding: 14px 18px calc(20px + env(safe-area-inset-bottom));
       border-top: 1px solid var(--border);
       flex-shrink: 0;
       display: flex;
