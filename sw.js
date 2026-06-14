@@ -1,4 +1,4 @@
-const CACHE = "transcribe-v1";
+const CACHE = "transcribe-v3";
 const ASSETS = ["/", "/index.html", "/manifest.json"];
 
 self.addEventListener("install", e => {
@@ -17,6 +17,6 @@ self.addEventListener("activate", e => {
 
 self.addEventListener("fetch", e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });
