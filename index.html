@@ -391,9 +391,6 @@
       <div class="toggle-btn active" id="togTimestamp">
         <span class="toggle-dot"></span>タイムスタンプ
       </div>
-      <div class="toggle-btn active" id="togAutoRestart">
-        <span class="toggle-dot"></span>自動再開
-      </div>
     </div>
 
     <div class="btn-row">
@@ -428,7 +425,6 @@ const blockCountEl  = document.getElementById("blockCount");
 const statusChip    = document.getElementById("statusChip");
 const selLang       = document.getElementById("selLang");
 const togTimestamp  = document.getElementById("togTimestamp");
-const togAutoRestart= document.getElementById("togAutoRestart");
 const btnRec        = document.getElementById("btnRec");
 const btnIcon       = document.getElementById("btnIcon");
 const btnLabel      = document.getElementById("btnLabel");
@@ -445,20 +441,14 @@ let blocks = [];           // { time, text }
 let timerSec = 0;
 let timerInterval = null;
 let restartTimer = null;
-let restartBackoff = 300;
 let wakeLock = null;
 
 // ── トグル設定 ───────────────────────────────────────────────
-let useTimestamp  = true;
-let useAutoRestart= true;
+let useTimestamp = true;
 
 togTimestamp.addEventListener("click", () => {
   useTimestamp = !useTimestamp;
   togTimestamp.classList.toggle("active", useTimestamp);
-});
-togAutoRestart.addEventListener("click", () => {
-  useAutoRestart = !useAutoRestart;
-  togAutoRestart.classList.toggle("active", useAutoRestart);
 });
 
 // ── トースト ─────────────────────────────────────────────────
@@ -604,16 +594,13 @@ if (!SR) {
     rec.maxAlternatives = 1;
 
     rec.onstart = () => {
-      restartBackoff = 300;
       setUI(true);
-      startTimer();
     };
 
     rec.onend = () => {
       setUI(false);
-      stopTimer();
       setInterim("");
-      if (wantRecording && useAutoRestart) scheduleRestart();
+      if (wantRecording) scheduleRestart();
     };
 
     rec.onerror = (e) => {
@@ -653,12 +640,12 @@ if (!SR) {
     clearRestartTimer();
     if (!wantRecording) return;
     restartTimer = setTimeout(() => {
+      if (!wantRecording) return;
       try {
         createRec();
         rec.start();
-        restartBackoff = Math.min(restartBackoff * 1.5, 3000);
       } catch { scheduleRestart(); }
-    }, restartBackoff);
+    }, 100);
   }
 
   // 言語変更
@@ -675,6 +662,7 @@ if (!SR) {
     wantRecording = true;
     clearRestartTimer();
     btnRec.classList.add("pulse");
+    startTimer();
 
     await acquireWakeLock();
 
@@ -705,6 +693,7 @@ if (!SR) {
     if (!wantRecording) return;
     wantRecording = false;
     clearRestartTimer();
+    stopTimer();
     releaseWakeLock();
     try { rec.stop(); } catch {}
     btnRec.classList.remove("pulse");
