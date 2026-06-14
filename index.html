@@ -6,6 +6,8 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#0d0d0d" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <title>録音・書き起こし</title>
   <style>
     :root {
@@ -759,6 +761,11 @@ if (!SR) {
     toast("消去しました");
   });
 
+}
+
+// ── Service Worker 登録 ──────────────────────────────────────
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 </script>
 </body>
